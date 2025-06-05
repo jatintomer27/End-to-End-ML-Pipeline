@@ -1,0 +1,7 @@
+# Let we will be using Elastic Net model and it is having some parameters
+
+# like alpha value , l1 ratio.
+
+ElasticNet:
+  alpha: 0.2
+  l1_ratio: 0.1

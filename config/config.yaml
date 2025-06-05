@@ -1,0 +1,22 @@
+# Contains all the configuration
+
+# Like what would be the data_injestion directory
+
+# Like what would be the data validation directory
+
+# Transformation directory ,  my data_url
+
+# and every other kind of configuration are here.
+
+artifacts_root: artifacts
+
+# In the context of a machine learning (ML) pipeline, an "artifacts directory" 
+# is a designated location for storing and managing the outputs generated 
+# during the pipeline's execution. These artifacts are crucial for tracking, 
+# versioning, and deploying ML models and other pipeline outputs
+
+data_ingestion:
+  root_dir: artifacts/data_ingestion
+  source_URL: https://github.com/entbappy/Branching-tutorial/raw/master/winequality-data.zip
+  local_data_file: artifacts/data_ingestion/data.zip
+  unzip_dir: artifacts/data_ingestion

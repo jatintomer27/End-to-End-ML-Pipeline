@@ -14,9 +14,9 @@ pip3 install -r requirements.txt
 1. Update config.yaml
 2. Update schema.yaml
 3. update params.yaml
-4. update the entity
-5. update the configuration manager in scr config
-6. update the components
-7. update the pipeline
+4. update the entity in src entity
+5. update the configuration manager in src config
+6. update the components (components like data_injestion, data_validation, etc)
+7. update the pipeline in src pipeline
 8. update the main.py
-9. Update the app.py
+9. Update the app.py 
