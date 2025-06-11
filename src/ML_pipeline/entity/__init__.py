@@ -1,0 +1,1 @@
+# Entity are the return type of a function.
