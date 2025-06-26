@@ -5,7 +5,6 @@ from pathlib import Path
 from ML_pipeline.config.configuration import ModelEvaluationConfig
 from ML_pipeline.utils.common import save_json
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from urllib.parse import urlparse
 
 class ModelEvaluation:
     def __init__(self, config:ModelEvaluationConfig):

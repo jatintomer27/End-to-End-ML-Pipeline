@@ -8,6 +8,10 @@ conda activate "env_name"
 
 pip3 install -r requirements.txt
 
+## How to create the project
+
+>> Create the predection pipeline to predict the data user has entered.
+>> Now create the user-interface using flask in app.py.
 
 ## Project workflow
 
@@ -20,3 +24,14 @@ pip3 install -r requirements.txt
 7. update the pipeline in src pipeline
 8. update the main.py
 9. Update the app.py 
+
+## How to run the project directly from main.py
+
+1. Activate the virtual env.
+2. python3 main.py
+
+## How to run the project with the web interfact.
+
+1. Activate the virtual env.
+2. python3 app.py
+

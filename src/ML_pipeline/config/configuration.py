@@ -53,8 +53,8 @@ class ConfigurationManager:
 
         data_validation_config = DataValidationConfig(
             root_dir=config.root_dir,
-            source_URL=config.STATUS_FILE,
-            local_data_dir=config.local_data_dir,
+            STATUS_FILE=config.STATUS_FILE,
+            unzip_data_dir=config.local_data_dir,
             all_schema=schema 
         )
 
@@ -62,7 +62,9 @@ class ConfigurationManager:
     
     def get_data_transformation_config(self)-> DataTransformationConfig:
         config = self.config.data_transformation
+        
         create_directories([config.root_dir])
+
         data_transformation_config = DataTransformationConfig(
             root_dir=config.root_dir,
             data_path=config.data_path

@@ -1,5 +1,5 @@
 from ML_pipeline.config.configuration import ConfigurationManager
-from ML_pipeline.entity.config_entity import DataTransformation
+from ML_pipeline.components.data_transformation import DataTransformation
 from ML_pipeline import logger
 from pathlib import Path
 

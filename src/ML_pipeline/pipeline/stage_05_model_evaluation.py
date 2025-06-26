@@ -3,7 +3,7 @@ from ML_pipeline.components.model_evaluation import ModelEvaluation
 
 STAGE_NAME = "Model Evaluation Stage"
 
-class ModelEvaluationStage:
+class ModelEvaluationTrainingPipeline:
     def __init__(self):
         pass
 
