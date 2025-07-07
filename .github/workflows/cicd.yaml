@@ -1,0 +1,140 @@
+# This is the name of the workflow. 
+# It will be displayed in the "Actions" tab of your GitHub repository
+# Not functionally necessary, but helps identify the workflow.
+
+name: workflow 
+
+
+
+# This defines the trigger of the workflow
+# That is, under what conditions should GitHub run this workflow
+
+on:
+  push: # Triggers this workflow whenever there is a git push
+    branches:
+      - main  # Only run this workflow when a push is made to the main branch
+    paths-ignore:
+      - 'README.md' # Do not trigger the workflow if the only file changed is README.md.
+
+
+
+# Sets permissions for the GitHub token in this workflow
+# Needed for OIDC-based authentication with AWS 
+# (instead of static credentials, though here secrets are still used).
+
+permissions:
+  id-token : write  # GitHub Actions create a digital ID card to talk to AWS
+  contents : read # Allows GitHub Actions reading the repository contents. 
+                  # Required to deploying ( checkout code ) it to AWS
+
+
+
+# Defines jobs that run sequentially
+
+jobs:
+  # integration (CI)
+  integration:
+
+    
+    name: Continous Integration     # The name shows in the GitHub UI
+    runs-on: ubuntu-latest          # Uses GitHub-hosted runner with latest Ubuntu
+    steps:                          # Each step in the job performs a task
+
+        # Tells GitHub to use a built-in tool that downloads your code from the repo.
+      - name: Checkout Code
+        uses: actions/checkout@v3 # is the official GitHub action and use version 3 of that tool.
+ 
+        # "Linting" is like checking your grammar — but for code. 
+        # Syntax errors (wrong symbols, missing colons, etc.)
+        # when GitHub Actions runs this step, it will show this line in the logs, 
+        # but it doesn’t check or fix any code.
+      - name: Lint Code
+        run: echo "Linting repository"
+
+      - name: Run unit tests
+        run: echo "Running unit tests" 
+
+
+  # Runs after the integration job finishes (needs: integration).
+  build-and-push-ecr-image:
+    name: Continuous Delivery
+    needs: integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        
+        # Installs necessary CLI tools
+      - name: Install Utilities
+        runs: |
+          sudo apt-get update
+          sudo apt-get install -y jq unzip
+
+      # Configures AWS CLI with credentials pulled from GitHub Secrets
+      # Allows interaction with AWS (e.g., pushing to ECR).
+      # telling the GitHub Actions here are your keys to access my AWS account
+      # Use them so you can deploy things there
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1 # GitHub Action created by AWS
+        # Hey GitHub, use the AWS login helper tool (version 1) 
+        # and log me into AWS using the keys I gave you.
+        with: 
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }} # GitHub repo → Settings → Secrets → Actions
+
+      # 
+      - name: Login to Amazon ECR 
+        id: login-ecr
+        uses : aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR  
+        id: build-image
+        env: 
+          ECR_REGISTORY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
+          IMAGE_TAG: latest
+        run: | 
+          # Build a docker container and 
+          # push it to ECR so that it can 
+          # can be deployed to ECS.
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTORY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+  Continuous-Deployment:
+
+    needs: build-and-push-ecr-image # Runs only after image has been pushed
+    # Uses a self-hosted runner (e.g., EC2 instance).This is important for deploying containers directly.
+    runs-on: self-hosted 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      
+      
+      - name: Pull latest images
+        run: |
+         docker pull ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+         
+      # Comment these 3 lines if you are configuring your application first time   
+      - name: Stop and remove container if running
+        run: |
+         docker ps -q --filter "name=cnncls" | grep -q . && docker stop cnncls && docker rm -fv cnncls
+       
+      - name: Run Docker Image to serve users
+        run: |
+         docker run -d -p 8080:8080 --name=cnncls -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}'  ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+      - name: Clean previous images and containers
+        run: |
+         docker system prune -f
