@@ -83,34 +83,57 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }} # GitHub repo → Settings → Secrets → Actions
 
-      # 
-      - name: Login to Amazon ECR 
-        id: login-ecr
-        uses : aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push image to Amazon ECR  
-        id: build-image
-        env: 
+      # This uses AWS's official GitHub Action to log into your ECR (Elastic Container Registry).
+      # After this step GitHub robot is authenticated and can now push images to your AWS ECR account.
+      - name: Login to Amazon ECR  # Just a label so we know what this step does
+        id: login-ecr              # Gives this step an ID (so other steps can refer to its output)
+        uses : aws-actions/amazon-ecr-login@v1  # Uses AWS’s official action to log into ECR
+
+
+      # So you’re telling Docker : "Build an image and label it like this: ECR_REGISTRY/ECR_REPOSITORY:latest
+      - name: Build, tag, and push image to Amazon ECR  # Label for this step — tells us it's building and pushing
+        id: build-image # Gives this step an ID so we can refer to its output later
+        env: # Set up Environment Variables
+        # Gets the URL of your ECR registry from the previous login step
           ECR_REGISTORY: ${{ steps.login-ecr.outputs.registry }}
+           # 	The name of the repository in your ECR account (set as a GitHub Secret)
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
-          IMAGE_TAG: latest
+          IMAGE_TAG: latest # Label for your Docker image version 
+
+        # Build a docker container and push it to ECR so that it can be deployed to ECS
+
+        # 1)This command builds your Docker image from the current folder (.)
+        # 1) -t sets the tag, or name of the image
+        # 2) his command uploads the image to your Amazon ECR registry, where it’s stored for future use.
+        # 3) Make the full image name available to other steps
         run: | 
-          # Build a docker container and 
-          # push it to ECR so that it can 
-          # can be deployed to ECS.
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTORY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-  Continuous-Deployment:
+        # Now your app is packaged, stored safely, and ready to be deployed on AWS ECS, EC2, etc.
+
+
+
+  # This is the deployment job in your GitHub Actions workflow — it's where your app finally goes live.
+  Continuous-Deployment: # This job is named Continuous-Deployment.
 
     needs: build-and-push-ecr-image # Runs only after image has been pushed
+
     # Uses a self-hosted runner (e.g., EC2 instance).This is important for deploying containers directly.
+    # This tells GitHub to run the job on a self-hosted runner (like an EC2 server you control),not GitHub’s own virtual machines.
+    # Why? Because now we want to deploy the app — and that usually happens on your own server, not GitHub's.
     runs-on: self-hosted 
     steps:
+
+        # This downloads the latest version of your code to the self-hosted runner
+        # This is needed if your app uses any local config or files during deployment.
       - name: Checkout
         uses: actions/checkout@v3
 
+        # Logs into AWS using your stored secrets.
+        # Needed to interact with ECR (to pull the Docker image).
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -118,23 +141,54 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+        # This action authenticates the server with AWS ECR, so it can pull Docker images from there 
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
       
-      
+        # Pulls the latest version of your app's Docker image from AWS ECR.
+        # This is like saying: “Get the newest version of the app I just uploaded.”
       - name: Pull latest images
         run: |
          docker pull ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
          
       # Comment these 3 lines if you are configuring your application first time   
+
+        # This ensures that the old version of your app is not still running, so we can replace it with the new one.
+        # Checks if a container named cnncls is already running.
+
+        # If yes, it:
+        # Stops it (docker stop cnncls)
+        # Removes it completely (docker rm -fv cnncls)
       - name: Stop and remove container if running
         run: |
          docker ps -q --filter "name=cnncls" | grep -q . && docker stop cnncls && docker rm -fv cnncls
-       
+      
+      #  This is where your app becomes live and accessible
+
+        # Runs the Docker container in the background (-d)
+        # Maps port 8080 of your server to 8080 in the container (so users can access it in browser)
+        # Names the container cnncls
+        # Passes AWS credentials into the container as environment variables (in case your app needs them inside)
+        # Uses the latest image from ECR to run the app
       - name: Run Docker Image to serve users
         run: |
          docker run -d -p 8080:8080 --name=cnncls -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}'  ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+      
+
+
+      # Clean Up Old Docker Stuff
+      # Helps free up space on the server so it doesn't fill up over time
+
+        # This command cleans up : Unused Docker containers, Unused images, Unused networks, Unused volumes
       - name: Clean previous images and containers
         run: |
          docker system prune -f
+
+
+
+
+# Here’s a complete summary table of all the GitHub Actions steps in your workflow YAML.
+# https://prnt.sc/s7LpkQx1Pzpw
+# https://prnt.sc/337HHoe8qC9z
+# https://prnt.sc/4iDVjTF4nxLJ
