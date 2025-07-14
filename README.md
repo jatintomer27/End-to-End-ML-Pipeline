@@ -13,6 +13,14 @@ pip3 install -r requirements.txt
 >> Create the predection pipeline to predict the data user has entered.
 >> Now create the user-interface using flask in app.py.
 
+## Steps to create the Project.
+
+1. create template.py
+2. Create folder structure using template.py
+3. Update the setup.py to make ML_pipeline as package
+4. Configure logger in ML_pipeline package.
+5. Update the constants and utils in ML_pipeline package
+
 ## Project workflow
 
 1. Update config.yaml

@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 from ML_pipeline.pipeline.state_06_predection import PredectionPipeline 
 
+# We have directly imported from the ML_pipeline 
+# because we have aleady installed ML_pipeline as my local package in the setup.py file. (SRC_REPO)
 
 # Initializing a flask app
 

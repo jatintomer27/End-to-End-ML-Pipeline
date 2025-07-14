@@ -19,3 +19,10 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger("MLProjectLogger") 
+
+# It defines a specific logger instance with the name "MLProjectLogger" 
+# that you can use throughout your ML project for structured and controlled logging.
+
+
+# sys.stdout is a built-in Python object that represents the standard output stream
+# typically the console or terminal where your program runs.

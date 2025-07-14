@@ -37,6 +37,18 @@ What we are doing here ?
 
 """
 
+"""
+What is typing.Any ?
+
+ - Any is a special type hint used to indicate that a variable can be of any type.
+
+ - It disables type checking for that variable — meaning anything goes.
+
+ - It is used When you're not sure of the data type (e.g., dynamic data, external input, configs).
+
+
+"""
+
 @ensure_annotations
 def read_yaml(path_to_yaml: Path) -> ConfigBox:
     """reads yaml file and returns
