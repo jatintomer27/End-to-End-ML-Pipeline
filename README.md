@@ -10,8 +10,8 @@ pip3 install -r requirements.txt
 
 ## How to create the project
 
->> Create the predection pipeline to predict the data user has entered.
->> Now create the user-interface using flask in app.py.
+- Create the predection pipeline to predict the data user has entered.
+- Now create the user-interface using flask in app.py.
 
 ## Steps to create the Project.
 
