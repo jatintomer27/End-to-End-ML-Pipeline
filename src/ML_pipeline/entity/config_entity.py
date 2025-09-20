@@ -3,8 +3,22 @@ from pathlib import Path
 
 # This is called entity and this is the return type of the configuration function.
 
-@dataclass(frozen=True) # Why we are using data class and will it do.
+"""
+@dataclass automatically generates __init__, __repr__, __eq__, and other boilerplate 
+for you based on the class attributes. This makes config objects concise and readable.
+"""
+
+"""
+The frozen=True argument makes instances immutable — after creation you cannot assign to their fields 
+(attempting to do so raises FrozenInstanceError).
+"""
+
+@dataclass(frozen=True) 
 class DataIngestionConfig:
+    """
+    Declares the class that holds configuration 
+    values for the data ingestion step.
+    """
     root_dir: Path
     source_URL: str
     local_data_file: Path
