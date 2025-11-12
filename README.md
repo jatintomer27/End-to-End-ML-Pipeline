@@ -59,5 +59,5 @@ pip3 install -r requirements.txt
 
 # AWS-CICD-Deployment-with-Github-Actions
 
-[Github Actions CI/CD Deployment](https://github.com/jatintomer27/End-to-End-ML-Pipeline.git)
+[Github Actions CI/CD Deployment](https://github.com/jatintomer27/MLOps/blob/main/class_10.md)
 
