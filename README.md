@@ -10,30 +10,37 @@ conda activate "env_name"
 
 pip3 install -r requirements.txt
 
-## How to create the project
+## Steps to create the project
 
-- Create the predection pipeline to predict the data user has entered.
-- Now create the user-interface using flask in app.py.
+01) Create the Github repository and clone it.
+02) Create the conda env and active it
+03) Create the template.py to create the project structure
+04) Update the requirements.txt and install it.
+05) Create the project as the package using the pyproject.toml file
+06) Write the logging component for the package
+07) Update the config/config.yaml file
+08) Update the schema.yaml file  ==> According to the DSA (Data sharing agreement)
+09) Update the params.yaml file
+10) Update the src/project_name/constants
+11) Update the src/project_name/utils
 
-## Steps to create the Project.
+12) Update the src/project_name/entity/config_entity.py          -------|
+13) Update the src/project_name/config/configuration.py                 |
+14) Update the src/project_name/components/data_ingestion.py            |  ==> Done in Notebook first and if working convert in into project modular
+15) Update the src/project_name/pipeline/data_ingestion.py       -------|
 
-1. create template.py
-2. Create folder structure using template.py
-3. Update the setup.py to make ML_pipeline as package
-4. Configure logger in ML_pipeline package.
-5. Update the constants and utils in ML_pipeline package
+16) Update the main.py   ===> From here all the things are tested and worked
 
-## Project workflow
+17) Like this we will do for all the steps ( Data ingestion, Data Validation, Data Transformation , Model Trainer , Model Evaluation )
 
-1. Update config.yaml
-2. Update schema.yaml
-3. update params.yaml
-4. update the entity in src entity
-5. update the configuration manager in src config
-6. update the components (components like data_injestion, data_validation, etc)
-7. update the pipeline in src pipeline
-8. update the main.py
-9. Update the app.py 
+18) Create the prediction pipeline 
+	==> Create the file src/<project_name>/pipeline/prediction.py
+
+19) Create the user interface ( app ) 
+	==> We will use flask to create the user app
+	==> Create the app.py
+	
+20) Run the project from app.py
 
 ## How to run the project directly from main.py
 
@@ -48,74 +55,5 @@ pip3 install -r requirements.txt
 
 # AWS-CICD-Deployment-with-Github-Actions
 
-## 1. Login to AWS console.
-
-## 2. Create IAM user for deployment
-
-	#with specific access
-
-	1. EC2 access : It is virtual machine
-
-	2. ECR: Elastic Container registry to save your docker image in aws
-
-
-	#Description: About the deployment
-
-	1. Build docker image of the source code
-
-	2. Push your docker image to ECR
-
-	3. Launch Your EC2 
-
-	4. Pull Your image from ECR in EC2
-
-	5. Lauch your docker image in EC2
-
-	#Policy:
-
-	1. AmazonEC2ContainerRegistryFullAccess
-
-	2. AmazonEC2FullAccess
-
-	
-## 3. Create ECR repo to store/save docker image
-    - Save the URI: 315865595366.dkr.ecr.us-east-1.amazonaws.com/winerepo
-
-	
-## 4. Create EC2 machine (Ubuntu) 
-
-## 5. Open EC2 and Install docker in EC2 Machine:
-	
-	
-	#optinal
-
-	sudo apt-get update -y
-
-	sudo apt-get upgrade
-	
-	#required
-
-	curl -fsSL https://get.docker.com -o get-docker.sh
-
-	sudo sh get-docker.sh
-
-	sudo usermod -aG docker ubuntu
-
-	newgrp docker
-	
-# 6. Configure EC2 as self-hosted runner:
-    setting>actions>runner>new self hosted runner> choose os> then run command one by one
-
-
-# 7. Setup github secrets:
-
-    AWS_ACCESS_KEY_ID=
-
-    AWS_SECRET_ACCESS_KEY=
-
-    AWS_REGION = us-east-1
-
-    AWS_ECR_LOGIN_URI = demo>>  566373416292.dkr.ecr.ap-south-1.amazonaws.com
-
-    ECR_REPOSITORY_NAME = simple-app
+![Github Actions CI/CD Deployment](https://github.com/jatintomer27/End-to-End-ML-Pipeline.git)
 
