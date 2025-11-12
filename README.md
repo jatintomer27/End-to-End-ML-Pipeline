@@ -6,9 +6,13 @@
 conda create -n "env_name" python=3.11 -y
 ```
 
+```bash
 conda activate "env_name"
+```
 
+```bash
 pip3 install -r requirements.txt
+```
 
 ## Steps to create the project
 
@@ -55,5 +59,5 @@ pip3 install -r requirements.txt
 
 # AWS-CICD-Deployment-with-Github-Actions
 
-![Github Actions CI/CD Deployment](https://github.com/jatintomer27/End-to-End-ML-Pipeline.git)
+[Github Actions CI/CD Deployment](https://github.com/jatintomer27/End-to-End-ML-Pipeline.git)
 
