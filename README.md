@@ -28,10 +28,10 @@ pip3 install -r requirements.txt
 10) Update the src/project_name/constants
 11) Update the src/project_name/utils
 
-12) Update the src/project_name/entity/config_entity.py          -------|
-13) Update the src/project_name/config/configuration.py                 |
-14) Update the src/project_name/components/data_ingestion.py            |  ==> Done in Notebook first and if working convert in into project modular
-15) Update the src/project_name/pipeline/data_ingestion.py       -------|
+12) Update the src/project_name/entity/config_entity.py          =====> Done in Notebook first and if working convert in into project modular
+13) Update the src/project_name/config/configuration.py          =====> Done in Notebook first and if working convert in into project modular
+14) Update the src/project_name/components/data_ingestion.py     =====> Done in Notebook first and if working convert in into project modular
+15) Update the src/project_name/pipeline/data_ingestion.py       =====> Done in Notebook first and if working convert in into project modular
 
 16) Update the main.py   ===> From here all the things are tested and worked
 
